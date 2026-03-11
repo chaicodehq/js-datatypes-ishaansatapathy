@@ -39,13 +39,10 @@ export function fixBollywoodTitle(title) {
     .map((word, idx) => {
       const lw = word.toLowerCase();
       if (idx === 0) {
-        // Always capitalize first word
         return lw.charAt(0).toUpperCase() + lw.slice(1);
       } else if (lowerWords.includes(lw)) {
-        // Lowercase small words in the middle
         return lw;
       } else {
-        // Capitalize other words
         return lw.charAt(0).toUpperCase() + lw.slice(1);
       }
     })
