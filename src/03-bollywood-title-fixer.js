@@ -31,4 +31,15 @@
  */
 export function fixBollywoodTitle(title) {
   // Your code here
+  if(typeof title !=="string"){
+    return ""
+  }
+  if(title.trim===""){
+    return ""
+  }
+  var duplicate=title.trim().split("")
+  var array=duplicate.map(element=> element.charAt(0).toUpperCase()+element.slice(1))
+  return array.join("")
+  
+  
 }

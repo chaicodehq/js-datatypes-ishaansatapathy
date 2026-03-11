@@ -10,7 +10,7 @@
  *     - totalMarks: sum of all marks (use reduce)
  *     - percentage: (totalMarks / (numSubjects * 100)) * 100,
  *       rounded to 2 decimal places using parseFloat(val.toFixed(2))
- *     - grade based on percentage:
+ *     - percentage based on percentage:
  *       "A+" (>= 90), "A" (>= 80), "B" (>= 70), "C" (>= 60), "D" (>= 40), "F" (< 40)
  *     - highestSubject: subject name with highest marks (use Object.entries)
  *     - lowestSubject: subject name with lowest marks
@@ -21,25 +21,82 @@
  *     reduce(), filter(), map(), Math.max(), Math.min(), toFixed()
  *
  * Validation:
- *   - Agar student object nahi hai ya null hai, return null
- *   - Agar student.name string nahi hai ya empty hai, return null
- *   - Agar student.marks object nahi hai ya empty hai (no keys), return null
+ *   - Agar student object nahi hai ya null hai, grade= null
+ *   - Agar student.name string nahi hai ya empty hai, grade= null
+ *   - Agar student.marks object nahi hai ya empty hai (no keys), grade= null
  *   - Agar koi mark valid number nahi hai (not between 0 and 100 inclusive),
- *     return null
+ *     grade= null
  *
  * @param {{ name: string, marks: Object<string, number> }} student
- * @returns {{ name: string, totalMarks: number, percentage: number, grade: string, highestSubject: string, lowestSubject: string, passedSubjects: string[], failedSubjects: string[], subjectCount: number } | null}
+ * @grade=s {{ name: string, totalMarks: number, percentage: number, percentage: string, highestSubject: string, lowestSubject: string, passedSubjects: string[], failedSubjects: string[], subjectCount: number } | null}
  *
  * @example
  *   generateReportCard({ name: "Rahul", marks: { maths: 85, science: 92, english: 78 } })
- *   // => { name: "Rahul", totalMarks: 255, percentage: 85, grade: "A",
+ *   // => { name: "Rahul", totalMarks: 255, percentage: 85, percentage: "A",
  *   //      highestSubject: "science", lowestSubject: "english",
  *   //      passedSubjects: ["maths", "science", "english"], failedSubjects: [],
  *   //      subjectCount: 3 }
  *
  *   generateReportCard({ name: "Priya", marks: { maths: 35, science: 28 } })
- *   // => { name: "Priya", totalMarks: 63, percentage: 31.5, grade: "F", ... }
+ *   // => { name: "Priya", totalMarks: 63, percentage: 31.5, percentage: "F", ... }
  */
 export function generateReportCard(student) {
-  // Your code here
+
+  if (!student || typeof student !== "object" || 
+      typeof student.name !== "string" || student.name.length === 0 ||
+      typeof student.marks !== "object" || student.marks === null ||
+      Object.keys(student.marks).length === 0) {
+    return null;
+  }
+
+  let values = Object.values(student.marks);
+  let subjectCount = values.length;
+
+  for (let mark of values) {
+    if (!Number.isFinite(mark) || mark < 0 || mark > 100) {
+      return null;
+    }
+  }
+
+  let totalMarks = values.reduce((a, b) => a + b, 0);
+
+  let percentageRaw = (totalMarks / (subjectCount * 100)) * 100;
+  let percentage = parseFloat(percentageRaw.toFixed(2));
+
+  let grade;
+  if (percentage >= 90) grade = "A+";
+  else if (percentage >= 80) grade = "A";
+  else if (percentage >= 70) grade = "B";
+  else if (percentage >= 60) grade = "C";
+  else if (percentage >= 40) grade = "D";
+  else grade = "F";
+
+  let highest = Math.max(...values);
+  let lowest = Math.min(...values);
+
+  let highestSubject = Object.keys(student.marks)
+    .find(sub => student.marks[sub] === highest);
+
+  let lowestSubject = Object.keys(student.marks)
+    .find(sub => student.marks[sub] === lowest);
+
+  let passedSubjects = Object.entries(student.marks)
+    .filter(([sub, mark]) => mark >= 40)
+    .map(([sub]) => sub);
+
+  let failedSubjects = Object.entries(student.marks)
+    .filter(([sub, mark]) => mark < 40)
+    .map(([sub]) => sub);
+
+  return {
+    name: student.name,
+    totalMarks: totalMarks,
+    percentage: percentage,
+    grade: grade,
+    highestSubject: highestSubject,
+    lowestSubject: lowestSubject,
+    passedSubjects: passedSubjects,
+    failedSubjects: failedSubjects,
+    subjectCount: subjectCount
+  };
 }
