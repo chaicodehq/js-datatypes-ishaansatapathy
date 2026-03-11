@@ -35,13 +35,19 @@ export function fixBollywoodTitle(title) {
   if (title === "") return "";
   const lowerWords = ["ka", "ki", "ke", "se", "aur", "ya", "the", "of", "in", "a", "an"];
   const words = title.split(" ");
-  const fixed = words.map((word, idx) => {
-    const lw = word.toLowerCase();
-    if (idx === 0 || !lowerWords.includes(lw)) {
-      return lw.charAt(0).toUpperCase() + lw.slice(1);
-    } else {
-      return lw;
-    }
-  });
-  return fixed.join(" ");
+  return words
+    .map((word, idx) => {
+      const lw = word.toLowerCase();
+      if (idx === 0) {
+        // Always capitalize first word
+        return lw.charAt(0).toUpperCase() + lw.slice(1);
+      } else if (lowerWords.includes(lw)) {
+        // Lowercase small words in the middle
+        return lw;
+      } else {
+        // Capitalize other words
+        return lw.charAt(0).toUpperCase() + lw.slice(1);
+      }
+    })
+    .join(" ");
 }
